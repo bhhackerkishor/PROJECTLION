@@ -1,1 +1,103 @@
-project Lion 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wave Loading Page</title>
+</head>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body{
+    background-color: #282c34;
+}
+
+.center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #282c34;
+}
+
+.loader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    width: 120px;
+    height: 60px;
+}
+
+.loader span {
+    display: block;
+    width: 6px;
+    height: 35px;
+    background-color: white;
+    animation: wave 1s infinite ease-in-out;
+}
+
+.loader span:nth-child(2) {
+    animation-delay: 0.1s;
+}
+
+.loader span:nth-child(3) {
+    animation-delay: 0.2s;
+}
+
+.loader span:nth-child(4) {
+    animation-delay: 0.3s;
+}
+
+.loader span:nth-child(5) {
+    animation-delay: 0.4s;
+}
+.footer{
+    margin: 0;
+  position: absolute;
+  bottom: 10%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 30px;
+}
+
+@keyframes wave {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-20px);
+    }
+}
+}ation-delay:
+</style>
+<body>
+  <div class="center">
+      
+  
+   <div class="loader">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+  
+      
+  </div>
+  <div class="footer">
+      The Project Lion 
+  </div>
+    
+  <script>
+  // Automatically redirect to homepage
+setTimeout(()=> {
+    window.location.href = 'homepage.html';
+}, 3000); 
+  
+  </script>
+</body>
+</html>
