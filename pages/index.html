@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dynamic Page</title>
+  <style>
+    /* Same styles as before */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+    }
+
+    .content {
+      padding: 20px;
+      height: calc(100vh - 70px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 24px;
+    }
+
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background-color: #333;
+      display: flex;
+      justify-content: space-around;
+      height: 70px;
+      align-items: center;
+      box-shadow: 0 -2px 5px rgba(0,0,0,0.2);
+    }
+
+    .bottom-nav a {
+      color: white;
+      text-align: center;
+      text-decoration: none;
+      flex-grow: 1;
+    }
+
+    .bottom-nav a.active {
+      background-color: #555;
+    }
+
+    .bottom-nav a span {
+      display: block;
+      font-size: 12px;
+    }
+
+    .bottom-nav i {
+      font-size: 24px;
+    }
+
+    .icon {
+      font-size: 30px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Main content container -->
+  <div class="content" id="main-content">
+    <!-- Default content will load here -->
+   
+  </div>
+
+  <!-- Bottom Navigation Menu -->
+  <div class="bottom-nav">
+    <a href="#" class="nav-item" data-page="tasks.html" onclick="loadPage('tasks.html')">
+      <i class="icon">📝</i>
+      <span>Tasks</span>
+    </a>
+    <a href="#" class="nav-item" data-page="frens.html" onclick="loadPage('frens.html')">
+      <i class="icon">👥</i>
+      <span>Frens</span>
+    </a>
+    <a href="#" class="nav-item" data-page="home.html" onclick="loadPage('home.html')">
+      <i class="icon">🏠</i>
+      <span>Home</span>
+    </a>
+    <a href="#" class="nav-item" data-page="activity.html" onclick="loadPage('activity.html')">
+      <i class="icon">📊</i>
+      <span>Activity</span>
+    </a>
+    <a href="#" class="nav-item" data-page="wallet.html" onclick="loadPage('wallet.html')">
+      <i class="icon">💼</i>
+      <span>Wallet</span>
+    </a>
+  </div>
+
+  <!-- JavaScript to load content dynamically -->
+  <script>
+  function loadPage(page) {
+      fetch(page)
+        .then(response => response.text())
+        .then(data => {
+          document.getElementById('main-content').innerHTML = data;
+          setActiveLink(page);
+
+          // Remove old script if it exists
+          removeScript('script.js');
+
+          // Load the home page script dynamically only for 'home.html'
+          if (page === 'home.html') {
+            loadScript('script.js');
+          }
+        })
+        .catch(error => {
+          document.getElementById('main-content').innerHTML = 'Error loading page.';
+        });
+    }
+
+    // Function to dynamically load a script
+    function loadScript(scriptUrl) {
+      const script = document.createElement('script');
+      script.src = scriptUrl;
+      script.id = scriptUrl; // Give an ID to the script tag
+      document.body.appendChild(script);
+
+      // Ensure the script is loaded properly by waiting for it
+      script.onload = function () {
+        console.log(scriptUrl + " loaded successfully.");
+      };
+    }
+
+    // Function to remove an existing script by ID
+    function removeScript(scriptId) {
+      const existingScript = document.getElementById(scriptId);
+      if (existingScript) {
+        existingScript.remove(); // Remove the old script if it exists
+        console.log(scriptId + " removed.");
+      }
+    }
+
+    // Highlight active menu item
+    function setActiveLink(page) {
+      const navItems = document.querySelectorAll('.bottom-nav a');
+      navItems.forEach(item => {
+        if (item.getAttribute('data-page') === page) {
+          item.classList.add('active');
+        } else {
+          item.classList.remove('active');
+        }
+      });
+    }
+
+    // Load the default page (Home Page) on page load
+    window.onload = function () {
+      loadPage('home.html');
+    };
+  </script>
+
+</body>
+</html>
