@@ -1,0 +1,65 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  overflow:hidden;
+  zoom: none;
+}
+
+body {
+  font-family: 'Arial', sans-serif;
+  background-color:black;
+  color: white;
+  text-align: center;
+  padding: 20px;
+}
+
+.container {
+  max-width: 600px;
+  margin: auto;
+}
+
+header {
+  margin-bottom: 40px;
+}
+
+h1 {
+  font-size: 2.5rem;
+  color: #FF6B6B;
+}
+
+p {
+  font-size: 1.2rem;
+}
+
+.score-container {
+  margin: 0;
+  position: absolute;
+  top: 10%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 0.4px solid white;
+  border-radius: 100px;
+  width: 200px;
+  
+}
+
+h2 {
+  font-size: 2rem;
+}
+#tap-btn{
+    background-color: black;
+    border: none;
+    margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+img{
+    border: 1px solid white;
+    border-radius: 150px;
+    background-color: transparent;
+    height: 250px;
+}
