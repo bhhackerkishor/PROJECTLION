@@ -1,0 +1,168 @@
+/* Game Container */
+.game-container {
+  width: 100%;
+  height: 100vh;
+  background-color: #222;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Arial', sans-serif;
+  color: #fff;
+}
+
+/* Game Header */
+.game-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 90%;
+  margin-bottom: 20px;
+}
+
+.game-title {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.game-controls {
+  display: flex;
+  align-items: center;
+}
+
+/* Game Board */
+.game-board {
+  width: 80%;
+  height: 80vh;
+  background-color: #333;
+  border: 2px solid #fff;
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(8, 1fr);
+  gap: 2px;
+}
+
+/* Game Tile */
+.game-tile {
+  background-color: #444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Game Item */
+.game-item {
+  width: 100%;
+  height: 100%;
+  background-image: url('path/to/item/image.png');
+  background-size: cover;
+}
+
+/* Game Timer */
+.game-timer {
+  font-size: 32px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+/* Game Score */
+.game-score {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+/* Game Button */
+.game-button {
+  padding: 10px 20px;
+
+/*
+  import React, { useState, useEffect } from "react";
+import "./App.css";
+
+function App() {
+  const [score, setScore] = useState(0);
+  const [flames, setFlames] = useState([
+    { x: 100, y: 100 },
+    { x: 200, y: 200 },
+    { x: 300, y: 300 },
+    { x: 400, y: 400 },
+  ]);
+  const [flameSize, setFlameSize] = useState(20);
+  const [speed, setSpeed] = useState(1);
+  const [gameOver, setGameOver] = useState(false);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setFlames((prevFlames) => {
+        return prevFlames.map((flame) => ({
+          ...flame,
+          y: flame.y + speed,
+        }));
+      });
+    }, 10);
+
+    return () => clearInterval(interval);
+  }, [speed]);
+
+  const handleFlameClick = (index) => {
+    const newFlames = [...flames];
+    newFlames.splice(index, 1);
+    setFlames(newFlames);
+    setScore(score + 1);
+    setFlameSize(flameSize + 2);
+    setSpeed(speed + 0.1);
+  };
+
+  useEffect(() => {
+    if (flames.length === 0) {
+      setGameOver(true);
+    }
+  }, [flames]);
+
+  const resetGame = () => {
+    setScore(0);
+    setFlames([
+      { x: 100, y: 100 },
+      { x: 200, y: 200 },
+      { x: 300, y: 300 },
+      { x: 400, y: 400 },
+    ]);
+    setFlameSize(20);
+    setSpeed(1);
+    setGameOver(false);
+  };
+
+  return (
+    <div className="App">
+      <div className="game -container">
+        {flames.map((flame, index) => (
+          <div
+            key={index}
+            style={{
+              position: "absolute",
+              top: flame.y,
+              left: flame.x,
+              width: flameSize,
+              height: flameSize,
+              backgroundColor: "red",
+              borderRadius: "50%",
+              cursor: "pointer",
+            }}
+            onClick={() => handleFlameClick(index)}
+          />
+        ))}
+        {gameOver && (
+          <div className="game-over">
+            <h1>Game Over!</h1>
+            <p>Score: {score}</p>
+            <button onClick={resetGame}>Play Again</button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default App;
+  */
