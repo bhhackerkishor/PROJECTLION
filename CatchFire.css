@@ -1,4 +1,113 @@
-/* Game Container
+/* import React, { useState, useEffect } from "react";
+
+const Game = () => {
+  const [fires, setFires] = useState(generateFires(5)); // Generate 5 fires initially
+  const [padPosition, setPadPosition] = useState(50);
+  const [timeLeft, setTimeLeft] = useState(45);
+  const [score, setScore] = useState(0);
+  const [isGameOver, setIsGameOver] = useState(false);
+
+  useEffect(() => {
+    // Set interval for the falling fire (speed doubled), but only if the game is not over
+    const intervalId = setInterval(() => {
+      if (!isGameOver) {
+        setFires((prevFires) => {
+          return prevFires.map((fire) => {
+            if (fire.y >= 100) {
+              // If fire reaches the bottom, reset it
+              return { x: Math.random() * 100, y: 0 };
+            }
+            return { ...fire, y: fire.y + 2 }; // Move each fire down twice as fast
+          });
+        });
+      }
+    }, 50); // Interval time reduced to make the fire fall faster
+
+    // Set interval for the game timer, but stop when it reaches 0
+    const timerId = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev > 0) {
+          return prev - 1;
+        } else {
+          setIsGameOver(true); // Set game over flag
+          clearInterval(timerId); // Stop the timer
+          return 0;
+        }
+      });
+    }, 1000);
+
+    return () => {
+      clearInterval(intervalId);
+      clearInterval(timerId);
+    };
+  }, [isGameOver]);
+
+  // Detect collisions
+  useEffect(() => {
+    if (!isGameOver) {
+      setFires((prevFires) =>
+        prevFires.map((fire) => {
+          if (fire.y >= 90 && fire.x > padPosition - 10 && fire.x < padPosition + 10) {
+            setScore((score) => score + 1); // Increase score
+            return { x: Math.random() * 100, y: 0 }; // Reset fire position
+          }
+          return fire;
+        })
+      );
+    }
+  }, [fires, padPosition, isGameOver]);
+
+  // Generate initial fires
+  function generateFires(num) {
+    let firesArray = [];
+    for (let i = 0; i < num; i++) {
+      firesArray.push({ x: Math.random() * 100, y: Math.random() * 50 });
+    }
+    return firesArray;
+  }
+
+  // Move pad
+  const handleMouseMove = (e) => {
+    if (!isGameOver) {
+      setPadPosition((e.clientX / window.innerWidth) * 100);
+    }
+  };
+
+  return (
+    <div onMouseMove={handleMouseMove} style={{ height: "100vh", position: "relative", backgroundColor: "#282c34" }}>
+      {fires.map((fire, index) => (
+        <div
+          key={index}
+          style={{
+            position: "absolute",
+            top: `${fire.y}%`,
+            left: `${fire.x}%`,
+            fontSize: "20px",
+          }}
+        >
+          🔥
+        </div>
+      ))}
+      <div
+        style={{
+          position: "absolute",
+          bottom: "0",
+          left: `${padPosition}%`,
+          width: "100px",
+          height: "20px",
+          backgroundColor: "blue",
+        }}
+      ></div>
+      <div style={{ position: "absolute", top: 0, left: 0, color: "white" }}>Time Left: {timeLeft}s</div>
+      <div style={{ position: "absolute", top: 0, right: 0, color: "white" }}>Score: {score}</div>
+      {isGameOver && <div style={{ position: "absolute", top: "50%", left: "50%", color: "white" }}>Game Over</div>}
+    </div>
+  );
+};
+
+export default Game;
+
+Game Container
 import React from "react";
 
 const PlayButton = ({ startGame }) => {
