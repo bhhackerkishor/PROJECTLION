@@ -1,4 +1,55 @@
-/* Game Container */
+/* Game Container
+import React from "react";
+
+const PlayButton = ({ startGame }) => {
+  return (
+    <div style={{ textAlign: "center", marginTop: "20%" }}>
+      <button
+        onClick={startGame}
+        style={{
+          fontSize: "24px",
+          padding: "10px 20px",
+          backgroundColor: "green",
+          color: "white",
+          border: "none",
+          borderRadius: "5px",
+          cursor: "pointer",
+        }}
+      >
+        Play Game
+      </button>
+    </div>
+  );
+};
+
+export default PlayButton;
+
+import React, { useState } from "react";
+import Game from "./Game"; // Import the Game component
+import PlayButton from "./PlayButton"; // Import the Play button component
+
+const App = () => {
+  const [isGameStarted, setIsGameStarted] = useState(false);
+
+  const startGame = () => {
+    setIsGameStarted(true); // Start the game when the button is clicked
+  };
+
+  return (
+    <div>
+      {!isGameStarted ? (
+        <PlayButton startGame={startGame} /> // Show the Play button if the game has not started
+      ) : (
+        <Game /> // Show the game once it has started
+      )}
+    </div>
+  );
+};
+
+export default App;
+
+
+*/
 .game-container {
   width: 100%;
   height: 100vh;
