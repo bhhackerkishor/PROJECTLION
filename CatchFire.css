@@ -2,7 +2,8 @@
 
 const Game = () => {
   const [fires, setFires] = useState(generateFires(5)); // Generate 5 fires initially
-  const [padPosition, setPadPosition] = useState(50);
+  const [padPosition, setPadPosition] = useState(50); // Position of the collector
+  const [dragging, setDragging] = useState(false); // State to track dragging
   const [timeLeft, setTimeLeft] = useState(45);
   const [score, setScore] = useState(0);
   const [isGameOver, setIsGameOver] = useState(false);
@@ -66,15 +67,29 @@ const Game = () => {
     return firesArray;
   }
 
-  // Move pad
+  // Handle mouse down (start dragging)
+  const handleMouseDown = () => {
+    setDragging(true);
+  };
+
+  // Handle mouse up (stop dragging)
+  const handleMouseUp = () => {
+    setDragging(false);
+  };
+
+  // Handle mouse move (update position when dragging)
   const handleMouseMove = (e) => {
-    if (!isGameOver) {
+    if (dragging && !isGameOver) {
       setPadPosition((e.clientX / window.innerWidth) * 100);
     }
   };
 
   return (
-    <div onMouseMove={handleMouseMove} style={{ height: "100vh", position: "relative", backgroundColor: "#282c34" }}>
+    <div
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+      style={{ height: "100vh", position: "relative", backgroundColor: "#282c34" }}
+    >
       {fires.map((fire, index) => (
         <div
           key={index}
@@ -89,6 +104,7 @@ const Game = () => {
         </div>
       ))}
       <div
+        onMouseDown={handleMouseDown}
         style={{
           position: "absolute",
           bottom: "0",
@@ -96,6 +112,7 @@ const Game = () => {
           width: "100px",
           height: "20px",
           backgroundColor: "blue",
+          cursor: "pointer",
         }}
       ></div>
       <div style={{ position: "absolute", top: 0, left: 0, color: "white" }}>Time Left: {timeLeft}s</div>
