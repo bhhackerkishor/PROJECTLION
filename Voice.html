@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Minder Pro + Notifications</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        /* Toast & General Styling */
+        * { padding: 0; margin: 0; box-sizing: border-box; font-family: "Poppins",sans-serif; }
+        body { background-color: #f4f7fe; display: flex; justify-content: center; padding: 20px; }
+        
+        .container { width: 100%; max-width: 400px; background: white; padding: 2rem; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); text-align: center; }
+        
+        /* Mic Button Styling */
+        .mic-btn { width: 70px; height: 70px; border-radius: 50%; border: none; background: #47D764; color: white; font-size: 1.5rem; cursor: pointer; margin-bottom: 20px; transition: 0.3s; }
+        .mic-btn.active { background: #ff355b; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 53, 91, 0.4); } 70% { transform: scale(1.1); box-shadow: 0 0 0 15px rgba(255, 53, 91, 0); } 100% { transform: scale(1); } }
+
+        /* Reminder List UI */
+        .reminder-item { background: #fff; border: 1px solid #eee; padding: 15px; border-radius: 12px; margin-top: 10px; display: flex; justify-content: space-between; align-items: center; text-align: left; }
+        .btn-group button { padding: 5px 10px; border-radius: 5px; border: none; cursor: pointer; margin-left: 5px; color: white; }
+        .del-btn { background: #ff355b; }
+        .pause-btn { background: #2F86EB; }
+
+        /* Toast Notification Container */
+        #toast-wrapper { position: fixed; top: 20px; right: 20px; width: 320px; z-index: 9999; }
+        .toast { width: 100%; height: 80px; padding: 15px; background: #fff; border-radius: 7px; display: grid; grid-template-columns: 1fr 4fr 0.5fr; box-shadow: 0 15px 30px rgba(0,0,0,0.1); margin-bottom: 10px; animation: slideIn 0.5s ease-out; }
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+        .toast.success { border-left: 8px solid #47D764; }
+        .toast.info { border-left: 8px solid #2F86EB; }
+        .toast i { font-size: 25px; align-self: center; }
+        .toast.success i { color: #47D764; }
+        .toast.info i { color: #2F86EB; }
+        .toast-text p:first-child { font-weight: 600; font-size: 14px; }
+        .toast-text p:last-child { font-size: 11px; color: #656565; }
+        .toast button { background: none; font-size: 20px; cursor: pointer; color: #ccc; align-self: flex-start; }
+    </style>
+</head>
+<body>
+
+<div id="toast-wrapper"></div>
+
+<div class="container">
+    <h2 style="margin-bottom: 20px;">Voice Reminders</h2>
+    <button id="mic-btn" class="mic-btn"><i class="fas fa-microphone"></i></button>
+    <p id="status" style="font-size: 12px; color: #888;">Tap to speak...</p>
+    
+    <div id="list-container" style="margin-top: 30px;">
+        <h3 style="font-size: 14px; text-align: left; color: #444;">Active Tasks</h3>
+    </div>
+</div>
+
+<script>
+    let reminders = JSON.parse(localStorage.getItem('voice_reminders')) || [];
+    let timers = {};
+
+    const micBtn = document.getElementById('mic-btn');
+    const listContainer = document.getElementById('list-container');
+    const toastWrapper = document.getElementById('toast-wrapper');
+
+    // 1. Browser Notification Permission (For Mobile/Background)
+    if (Notification.permission !== "granted") {
+        Notification.requestPermission();
+    }
+
+    // 2. Speech Engine
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+
+    micBtn.onclick = () => { recognition.start(); micBtn.classList.add('active'); };
+    recognition.onend = () => micBtn.classList.remove('active');
+
+    recognition.onresult = (event) => {
+        const text = event.results[0][0].transcript.toLowerCase();
+        parseIntent(text);
+        console.log(text)
+    };
+
+    function parseIntent(text) {
+        const regex = /remind me to (.+?) (every|in) (\d+) (second|minute|hour)s?/;
+        const match = text.match(regex);
+
+        if (match) {
+            const reminder = {
+                id: Date.now(),
+                task: match[1],
+                type: match[2],
+                val: parseInt(match[3]),
+                unit: match[4],
+                paused: false
+            };
+            reminders.push(reminder);
+            save();
+            render();
+            startClock(reminder);
+            showToast("success", "Reminder Set", `Task: ${reminder.task}`);
+        } else {
+            showToast("info", "Try Again", "Say: 'Remind me to drink water in 10 seconds'");
+        }
+    }
+
+    // 3. The Notification Logic (Dual System)
+    function triggerNotification(task) {
+        // UI Toast
+        showToast("info", "⏰ Time's Up!", task);
+        
+        // System Notification (Works on Mobile/Desktop Background)
+        if (Notification.permission === "granted") {
+            navigator.serviceWorker.ready.then(registration => {
+                registration.showNotification("Reminder", {
+                    body: task,
+                    icon: "https://cdn-icons-png.flaticon.com/512/311/311022.png",
+                    vibrate: [200, 100, 200]
+                });
+            }).catch(() => {
+                // Fallback for simple browsers
+                new Notification("Reminder", { body: task });
+            });
+        }
+    }
+
+    function showToast(type, title, message) {
+        const icon = type === 'success' ? 'check-circle' : 'info-circle';
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.innerHTML = `
+            <div class="container-1"><i class="fas fa-${icon}"></i></div>
+            <div class="toast-text"><p>${title}</p><p>${message}</p></div>
+            <button onclick="this.parentElement.remove()">&times;</button>
+        `;
+        toastWrapper.appendChild(toast);
+        setTimeout(() => toast.remove(), 4000);
+    }
+
+    // 4. Timer Management
+    function startClock(r) {
+        let ms = r.val * 1000;
+        if (r.unit.includes('minute')) ms *= 60;
+        if (r.unit.includes('hour')) ms *= 3600;
+
+        if (r.type === 'every') {
+            timers[r.id] = setInterval(() => triggerNotification(r.task), ms);
+        } else {
+            timers[r.id] = setTimeout(() => {
+                triggerNotification(r.task);
+                deleteReminder(r.id);
+            }, ms);
+        }
+    }
+
+    function deleteReminder(id) {
+        clearInterval(timers[id]);
+        clearTimeout(timers[id]);
+        reminders = reminders.filter(r => r.id !== id);
+        save();
+        render();
+    }
+
+    function save() { localStorage.setItem('voice_reminders', JSON.stringify(reminders)); }
+
+    function render() {
+        const items = reminders.map(r => `
+            <div class="reminder-item">
+                <div><strong>${r.task}</strong><br><small>${r.type} ${r.val} ${r.unit}</small></div>
+                <div class="btn-group">
+                    <button class="del-btn" onclick="deleteReminder(${r.id})"><i class="fas fa-trash"></i></button>
+                </div>
+            </div>
+        `).join('');
+        listContainer.innerHTML = '<h3 style="font-size: 14px; text-align: left; color: #444;">Active Tasks</h3>' + items;
+    }
+
+    // Load existing
+    window.onload = () => { render(); reminders.forEach(startClock); };
+</script>
+
+</body>
+</html>
