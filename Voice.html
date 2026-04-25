@@ -102,23 +102,19 @@
 
     // 3. The Notification Logic (Dual System)
     function triggerNotification(task) {
-        // UI Toast
-        showToast("info", "⏰ Time's Up!", task);
-        
-        // System Notification (Works on Mobile/Desktop Background)
-        if (Notification.permission === "granted") {
-            navigator.serviceWorker.ready.then(registration => {
-                registration.showNotification("Reminder", {
-                    body: task,
-                    icon: "https://cdn-icons-png.flaticon.com/512/311/311022.png",
-                    vibrate: [200, 100, 200]
-                });
-            }).catch(() => {
-                // Fallback for simple browsers
-                new Notification("Reminder", { body: task });
+    showToast("info", "⏰ Time's Up!", task);
+
+    if (Notification.permission === "granted") {
+        navigator.serviceWorker.ready.then(registration => {
+            registration.showNotification("Reminder", {
+                body: task,
+                icon: "https://cdn-icons-png.flaticon.com/512/311/311022.png",
+                vibrate: [200, 100, 200],
+                badge: "https://cdn-icons-png.flaticon.com/512/311/311022.png" // Small icon for status bar
             });
-        }
+        });
     }
+}
 
     function showToast(type, title, message) {
         const icon = type === 'success' ? 'check-circle' : 'info-circle';
@@ -172,7 +168,18 @@
     }
 
     // Load existing
-    window.onload = () => { render(); reminders.forEach(startClock); };
+    window.onload = () => {
+    render();
+    reminders.forEach(startClock);
+
+    // Register the Service Worker for GitHub Pages
+    if ('serviceWorker' in navigator) {
+        // Use './sw.js' to ensure it works in the GitHub subfolder
+        navigator.serviceWorker.register('./sw.js')
+            .then(() => console.log("Service Worker Registered"))
+            .catch(err => console.log("Service Worker Failed", err));
+    }
+};
 </script>
 
 </body>
